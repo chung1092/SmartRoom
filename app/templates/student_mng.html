@@ -7,12 +7,12 @@
         <div class="row">
             <div class="col-12">
                 <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
-                    <h4 class="mb-sm-0">Listjs</h4>
+                    <h4 class="mb-sm-0">Danh sách sinh viên</h4>
 
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">Tables</a></li>
-                            <li class="breadcrumb-item active">Listjs</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">Bảng</a></li>
+                            <li class="breadcrumb-item active">Danh sách sinh viên</li>
                         </ol>
                     </div>
 
@@ -25,7 +25,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-0">Add, Edit & Remove</h4>
+                        <h4 class="card-title mb-0">Thêm, Sửa và Xóa</h4>
                     </div><!-- end card header -->
 
                     <div class="card-body">
@@ -33,14 +33,20 @@
                             <div class="row g-4 mb-3">
                                 <div class="col-sm-auto">
                                     <div>
-                                        <button type="button" class="btn btn-success add-btn" data-bs-toggle="modal" id="create-btn" data-bs-target="#showModal"><i class="ri-add-line align-bottom me-1"></i> Add</button>
-                                        <button class="btn btn-soft-danger" onClick="deleteMultiple()"><i class="ri-delete-bin-2-line"></i></button>
+                                        <button type="button" class="btn btn-success add-btn" data-bs-toggle="modal"
+                                            id="create-btn" data-bs-target="#showModal"><i
+                                                class="ri-add-line align-bottom me-1"></i> Thêm</button>
+                                        <input type="file" id="fileInput" accept=".xlsx, .csv" style="display: none;">
+                                        <button type="button" class="btn btn-success"
+                                            onclick="document.getElementById('fileInput').click();">
+                                            <i class="ri-upload-2-line align-bottom me-1"></i> Nhập File
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="col-sm">
                                     <div class="d-flex justify-content-sm-end">
                                         <div class="search-box ms-2">
-                                            <input type="text" class="form-control search" placeholder="Search...">
+                                            <input type="text" class="form-control search" placeholder="Tìm kiếm...">
                                             <i class="ri-search-line search-icon"></i>
                                         </div>
                                     </div>
@@ -53,48 +59,89 @@
                                         <tr>
                                             <th scope="col" style="width: 50px;">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="checkAll" value="option">
+                                                    <input class="form-check-input" type="checkbox" id="checkAll"
+                                                        value="option">
                                                 </div>
                                             </th>
-                                            <th class="sort" data-sort="customer_name">Customer</th>
+                                            <th class="sort" data-sort="customer_name">Họ và tên</th>
+                                            <th class="sort" data-sort="text">Mã sinh viên</th>
                                             <th class="sort" data-sort="email">Email</th>
-                                            <th class="sort" data-sort="phone">Phone</th>
-                                            <th class="sort" data-sort="date">Joining Date</th>
-                                            <th class="sort" data-sort="status">Delivery Status</th>
-                                            <th class="sort" data-sort="action">Action</th>
+                                            <th class="sort" data-sort="phone">Số điện thoại</th>
+                                            <th class="sort" data-sort="text">Trạng thái</th>
+                                            <th class="sort" data-sort="action">Hành động</th>
                                         </tr>
                                     </thead>
                                     <tbody class="list form-check-all">
+                                        {% for student in students %}
                                         <tr>
                                             <th scope="row">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="chk_child" value="option1">
+                                                    <input class="form-check-input" type="checkbox" name="chk_child"
+                                                        value="{{ student.id }}">
                                                 </div>
                                             </th>
-                                            <td class="id" style="display:none;"><a href="javascript:void(0);" class="fw-medium link-primary">#VZ2101</a></td>
-                                            <td class="customer_name">Mary Cousar</td>
-                                            <td class="email">marycousar@velzon.com</td>
-                                            <td class="phone">580-464-4694</td>
-                                            <td class="date">06 Apr, 2021</td>
-                                            <td class="status"><span class="badge bg-success-subtle text-success text-uppercase">Active</span></td>
+                                            <td class="id" style="display:none;"><a href="javascript:void(0);"
+                                                    class="fw-medium link-primary">#{{ student.id }}</a></td>
+                                            <td class="customer_name">{{ student.name }}</td>
+                                            <td class="text">{{ student.student_code }}</td>
+                                            <td class="email">{{ student.email }}</td>
+                                            <td class="phone">{{ student.phone }}</td>
+                                            <td class="text">
+                                                {% if student.status %}
+                                                <span class="badge bg-success">Đã xác thực</span>
+                                                {% else %}
+                                                <span class="badge bg-warning">Chưa xác thực</span>
+                                                {% endif %}
+                                            </td>
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <div class="edit">
-                                                        <button class="btn btn-sm btn-success edit-item-btn" data-bs-toggle="modal" data-bs-target="#showModal">Edit</button>
+                                                        <button class="btn btn-sm btn-success edit-item-btn"
+                                                            data-bs-toggle="modal" data-bs-target="#showModal"
+                                                            data-id="{{ student.id }}" data-name="{{ student.name }}"
+                                                            data-student-code="{{ student.student_code }}"
+                                                            data-student-identifier="{{ student.student_identifier }}"
+                                                            data-email="{{ student.email }}"
+                                                            data-phone="{{ student.phone }}">
+                                                            Sửa
+                                                        </button>
                                                     </div>
                                                     <div class="remove">
-                                                        <button class="btn btn-sm btn-danger remove-item-btn" data-bs-toggle="modal" data-bs-target="#deleteRecordModal">Remove</button>
+                                                        <button class="btn btn-sm btn-danger remove-item-btn"
+                                                            data-bs-toggle="modal" data-bs-target="#deleteRecordModal"
+                                                            data-id="{{ student.id }}">
+                                                            Xóa
+                                                        </button>
                                                     </div>
+                                                    {% if student.status %}
+                                                    <div class="authenticate">
+                                                        <button class="btn btn-sm btn-success authenticate"
+                                                            data-id="{{ student.id }}" data-bs-toggle="modal"
+                                                            data-bs-target="#authenticateModal">
+                                                            Xác thực
+                                                        </button>
+                                                    </div>
+                                                    {% else %}
+                                                    <div class="authenticate">
+                                                        <button class="btn btn-sm btn-danger authenticate"
+                                                            data-id="{{ student.id }}" data-bs-toggle="modal"
+                                                            data-bs-target="#authenticateModal">
+                                                            Xác thực
+                                                        </button>
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </td>
                                         </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                                 <div class="noresult" style="display: none">
                                     <div class="text-center">
-                                        <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop" colors="primary:#121331,secondary:#08a88a" style="width:75px;height:75px"></lord-icon>
-                                        <h5 class="mt-2">Sorry! No Result Found</h5>
-                                        <p class="text-muted mb-0">We've searched more than 150+ Orders We did not find any orders for you search.</p>
+                                        <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                            colors="primary:#121331,secondary:#08a88a"
+                                            style="width:75px;height:75px"></lord-icon>
+                                        <h5 class="mt-2">Không tìm thấy kết quả</h5>
                                     </div>
                                 </div>
                             </div>
@@ -102,11 +149,11 @@
                             <div class="d-flex justify-content-end">
                                 <div class="pagination-wrap hstack gap-2">
                                     <a class="page-item pagination-prev disabled" href="javascript:void(0);">
-                                        Previous
+                                        Trước
                                     </a>
                                     <ul class="pagination listjs-pagination mb-0"></ul>
                                     <a class="page-item pagination-next" href="javascript:void(0);">
-                                        Next
+                                        Tiếp theo
                                     </a>
                                 </div>
                             </div>
@@ -124,56 +171,57 @@
                 <div class="modal-content">
                     <div class="modal-header bg-light p-3">
                         <h5 class="modal-title" id="exampleModalLabel"></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="close-modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            id="close-modal"></button>
                     </div>
-                    <form class="tablelist-form" autocomplete="off">
-                        <div class="modal-body">
+                    <div class="modal-body">
+                        <form class="tablelist-form" id="add-student-form" autocomplete="off" method="POST"
+                            action="{{ url_for('view.add_student') }}">
                             <div class="mb-3" id="modal-id" style="display: none;">
                                 <label for="id-field" class="form-label">ID</label>
                                 <input type="text" id="id-field" class="form-control" placeholder="ID" readonly />
                             </div>
 
                             <div class="mb-3">
-                                <label for="customername-field" class="form-label">Customer Name</label>
-                                <input type="text" id="customername-field" class="form-control" placeholder="Enter Name" required />
-                                <div class="invalid-feedback">Please enter a customer name.</div>
+                                <label for="name-field" class="form-label">Họ và tên</label>
+                                <input type="text" id="name-field" name="name" class="form-control"
+                                    placeholder="Nhập họ và tên" required />
+                                <div class="invalid-feedback">Nhập họ và tên.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="student_code-field" class="form-label">Mã sinh viên</label>
+                                <input type="text" id="student_code-field" name="student_code" class="form-control"
+                                    placeholder="Nhập mã sinh viên" required />
+                                <div class="invalid-feedback">Nhập mã sinh viên.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="student_identifier-field" class="form-label">Số căn cước công dân</label>
+                                <input type="text" id="student_identifier-field" name="student_identifier"
+                                    class="form-control" placeholder="Nhập số căn cước công dân" required />
+                                <div class="invalid-feedback">Nhập số căn cước công dân.</div>
                             </div>
 
                             <div class="mb-3">
                                 <label for="email-field" class="form-label">Email</label>
-                                <input type="email" id="email-field" class="form-control" placeholder="Enter Email" required />
-                                <div class="invalid-feedback">Please enter an email.</div>
+                                <input type="email" id="email-field" name="email" class="form-control"
+                                    placeholder="Nhập email" required />
+                                <div class="invalid-feedback">Nhập email.</div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="phone-field" class="form-label">Phone</label>
-                                <input type="text" id="phone-field" class="form-control" placeholder="Enter Phone no." required />
-                                <div class="invalid-feedback">Please enter a phone.</div>
+                                <label for="phone-field" class="form-label">Số điện thoại</label>
+                                <input type="text" id="phone-field" name="phone" class="form-control"
+                                    placeholder="Nhập số điện thoại." required />
+                                <div class="invalid-feedback">Nhập số điện thoại.</div>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="date-field" class="form-label">Joining Date</label>
-                                <input type="text" id="date-field" class="form-control" placeholder="Select Date" required />
-                                <div class="invalid-feedback">Please select a date.</div>
-                            </div>
-
-                            <div>
-                                <label for="status-field" class="form-label">Status</label>
-                                <select class="form-control" data-trigger name="status-field" id="status-field" required>
-                                    <option value="">Status</option>
-                                    <option value="Active">Active</option>
-                                    <option value="Block">Block</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <div class="hstack gap-2 justify-content-end">
-                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-success" id="add-btn">Add Customer</button>
-                                <!-- <button type="button" class="btn btn-success" id="edit-btn">Update</button> -->
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-success" id="add-btn">Thêm sinh viên</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -183,19 +231,21 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            id="btn-close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mt-2 text-center">
-                            <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop" colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
+                            <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
+                                colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
                             <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
-                                <h4>Are you Sure ?</h4>
-                                <p class="text-muted mx-4 mb-0">Are you Sure You want to Remove this Record ?</p>
+                                <h4>Bạn có chắc ?</h4>
+                                <p class="text-muted mx-4 mb-0">Bạn có chắc là bạn muốn xóa bản ghi này không ?</p>
                             </div>
                         </div>
                         <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
-                            <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn w-sm btn-danger " id="delete-record">Yes, Delete It!</button>
+                            <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Đóng</button>
+                            <button type="button" class="btn w-sm btn-danger " id="delete-record">Xóa!</button>
                         </div>
                     </div>
                 </div>
@@ -203,7 +253,135 @@
         </div>
         <!--end modal -->
 
+        <!-- Add this modal before the closing body tag -->
+        <div class="modal fade" id="authenticateModal" tabindex="-1" aria-labelledby="authenticateModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="authenticateModalLabel">Xác thực khuôn mặt</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="authenticateForm" enctype="multipart/form-data" onsubmit="return false;">
+                            <input type="hidden" id="student_id" name="student_id">
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Chọn ảnh khuôn mặt</label>
+                                <input type="file" class="form-control" id="file" name="file" accept="image/*" required>
+                                <div class="invalid-feedback">Vui lòng chọn một ảnh.</div>
+                            </div>
+                            <div id="imagePreview" class="text-center mb-3" style="display: none;">
+                                <img id="previewImage" class="img-fluid rounded" style="max-height: 200px;">
+                            </div>
+                        </form>
+                        <div id="authMessage" class="mt-2"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-primary" id="submitAuthenticate">Xác nhận</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
     <!-- container-fluid -->
 </div>
+<script>
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/add_student_file', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => response.json())  // Đọc phản hồi JSON
+            .then(data => {
+                if (data.success) {
+                    window.location.href = "/student_mng";  // Reload trang bằng JavaScript
+                } else {
+                    Swal.fire("Lỗi!", data.message, "error");
+                }
+            })
+            .catch(error => {
+                Swal.fire("Lỗi!", "Không thể tải file lên!", "error");
+            });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Khi nhấn nút "Xác thực", lấy student.id và hiển thị modal
+        document.querySelectorAll(".authenticate button").forEach(button => {
+            button.addEventListener("click", function () {
+                let studentId = this.getAttribute("data-id");
+                document.getElementById("student_id").value = studentId; // Gán student_id vào input ẩn
+            });
+        });
+
+        // Hiển thị ảnh xem trước
+        document.getElementById("file").addEventListener("change", function (event) {
+            let file = event.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("previewImage").src = e.target.result;
+                    document.getElementById("imagePreview").style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Gửi form bằng AJAX
+        document.getElementById("submitAuthenticate").addEventListener("click", function () {
+            let studentId = document.getElementById("student_id").value;
+            let fileInput = document.getElementById("file");
+            let file = fileInput.files[0];
+
+            if (!file) {
+                alert("Vui lòng chọn một ảnh.");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("student_id", studentId);
+            formData.append("file", file);
+
+            fetch("/add_face", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    let messageDiv = document.getElementById("authMessage");
+                    messageDiv.innerHTML = data.message;
+                    if (data.success) {
+                        messageDiv.className = "mt-2 alert alert-success";
+                        setTimeout(() => {
+                            location.reload();  // Refresh trang sau 2 giây nếu thành công
+                        }, 2000);
+                    } else {
+                        messageDiv.className = "mt-2 alert alert-danger";
+                    }
+                })
+                .catch(error => {
+                    let messageDiv = document.getElementById("authMessage");
+                    messageDiv.innerHTML = "Có lỗi xảy ra: " + error;
+                    messageDiv.className = "mt-2 alert alert-danger";
+                });
+        });
+    });
+
+
+    document.getElementById("add-btn").addEventListener("click", function (event) {
+        event.preventDefault(); // Ngăn chặn hành vi mặc định của nút
+        document.getElementById("add-student-form").submit(); // Submit form bằng JavaScript
+    });
+</script>
+
 {% endblock %}

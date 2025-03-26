@@ -73,7 +73,7 @@
                 <!-- App Search-->
                 <form class="app-search d-none d-md-block">
                     <div class="position-relative">
-                        <input type="text" class="form-control" placeholder="Search..." autocomplete="off" id="search-options" value="">
+                        <input type="text" class="form-control" placeholder="Tìm kiếm..." autocomplete="off" id="search-options" value="">
                         <span class="mdi mdi-magnify search-widget-icon"></span>
                         <span class="mdi mdi-close-circle search-widget-icon search-widget-icon-close d-none" id="search-close-options"></span>
                     </div>
@@ -828,7 +828,8 @@
                     </div>
                     <ul class="navbar-nav" id="navbar-nav">
                         <li class="menu-title"><span data-key="t-menu">Menu</span></li>
-                        <li class="nav-item">
+                        
+                        <!-- <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarDashboards" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarDashboards">
                                 <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
                             </a>
@@ -860,7 +861,7 @@
                                     </li>
                                 </ul>
                             </div>
-                        </li> <!-- end Dashboard Menu -->
+                        </li> 
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarApps" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarApps">
                                 <i class="ri-apps-2-line"></i> <span data-key="t-apps">Apps</span>
@@ -1207,7 +1208,7 @@
                                     </li>
                                 </ul>
                             </div>
-                        </li> <!-- end Dashboard Menu -->
+                        </li> 
 
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Pages</span></li>
 
@@ -1578,17 +1579,25 @@
                                     </div>
                                 </div>
                             </div>
-                        </li>
-
-
+                        </li> -->
 
                         <li class="nav-item">
-                            <a class="nav-link menu-link" href="widgets.html">
-                                <i class="ri-honour-line"></i> <span data-key="t-widgets">Widgets</span>
+                            <a class="nav-link menu-link" href="{{ url_for('view.index') }}">
+                                <i class="ri-honour-line"></i> <span data-key="t-widgets">Trang chủ</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="{{ url_for('view.student_mng') }}">
+                                <i class="ri-honour-line"></i> <span data-key="t-widgets">Danh sách sinh viên</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="{{ url_for('view.recognize') }}">
+                                <i class="ri-honour-line"></i> <span data-key="t-widgets">Nhận diện ảnh</span>
                             </a>
                         </li>
 
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarForms" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarForms">
                                 <i class="ri-file-list-3-line"></i> <span data-key="t-forms">Forms</span>
                             </a>
@@ -1848,7 +1857,7 @@
                                     </li>
                                 </ul>
                             </div>
-                        </li>
+                        </li> -->
 
                     </ul>
                 </div>
