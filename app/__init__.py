@@ -1,0 +1,27 @@
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+import os
+
+db = SQLAlchemy()
+
+def create_app():
+    app = Flask(__name__)
+    
+    app.config['SECRET_KEY'] = 'NVQDTHNVTTTPNTNNVQNTLNVC'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://sa:123456@VAN_CHUONG/SmartRoom?driver=ODBC+Driver+17+for+SQL+Server'
+    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
+    
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    
+    db.init_app(app)
+    
+    from .views import view
+    from .auth import auth
+    
+    app.register_blueprint(view)
+    app.register_blueprint(auth)
+    
+    with app.app_context():
+        db.create_all()
+    
+    return app 
