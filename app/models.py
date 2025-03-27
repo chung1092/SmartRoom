@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash
 from sqlalchemy import Column, Integer, String, Boolean,Identity
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.types import PickleType
+from datetime import datetime
 
 
 Base = declarative_base()
@@ -57,5 +58,6 @@ def save_face(image_path, id):
     student.status = True
     db.session.commit()
     return True, "Face encoding updated successfully"
+
 
      

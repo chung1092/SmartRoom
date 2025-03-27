@@ -1,6 +1,6 @@
 import time
 import face_recognition
-from flask import Blueprint, render_template, request, redirect, url_for, current_app, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, current_app, jsonify, send_from_directory
 from gtts import gTTS
 import numpy as np
 from werkzeug.utils import secure_filename
@@ -16,6 +16,8 @@ from .models import Student
 from sqlalchemy import inspect
 import subprocess
 import base64
+from io import BytesIO
+from datetime import datetime
 
 
 view = Blueprint('view', __name__)
@@ -118,9 +120,10 @@ def add_face():
         return jsonify({"success": success, "message": message})
     else:
         os.remove(filepath)
-
+name = ""
 @view.route('/recognize', methods=['GET', 'POST'])
 def recognize():
+    global name
     if request.method == 'GET':
         return render_template('recognize.html')
     if 'file' not in request.files:
@@ -132,8 +135,7 @@ def recognize():
         image_data = file.read()
         image = Image.open(io.BytesIO(image_data))
         
-        image_array = np.array(image     
-)
+        image_array = np.array(image)
         face_encodings = face_recognition.face_encodings(image_array)
         
         if not face_encodings:
@@ -152,7 +154,7 @@ def recognize():
             
             face_distances.sort(key=lambda x: x[1])
 
-            if face_distances and face_distances[0][1] < 0.6:
+            if face_distances and face_distances[0][1] < 0.5:
                 results.append(face_distances[0][0])
             else:
                 results.append(Student(name="Không xác định"))
@@ -162,11 +164,13 @@ def recognize():
             
             joined_names = " và ".join([r.name for r in results])
             message = f"Xin chào! {joined_names}."
-            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
-            temp_file.close()
-            tts = gTTS(text=message, lang='vi')
-            tts.save(temp_file.name)
-            subprocess.Popen(["start", temp_file.name], shell=True)
+            if name != joined_names:
+                name = joined_names
+                temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+                temp_file.close()
+                tts = gTTS(text=message, lang='vi')
+                tts.save(temp_file.name)
+                subprocess.Popen(["start", temp_file.name], shell=True)
             if results and isinstance(results[0], Student):
                 student = results[0]
                 student_data = {
@@ -176,11 +180,12 @@ def recognize():
                     "email": getattr(student, "email", "Không có email"),
                     "phone": getattr(student, "phone", "Không có số điện thoại"),
                 }
-                time.sleep(2)
-                try:
-                    os.remove(temp_file.name)
-                except:
-                    pass
+                if joined_names != name:
+                    time.sleep(2)
+                    try:
+                        os.remove(temp_file.name)
+                    except:
+                        pass
                 return jsonify({"success": True, "student": student_data})
             else:
                 return jsonify({"success": False, "message": "Không tìm thấy sinh viên"})
@@ -223,7 +228,7 @@ def recognize_video():
                 
                 face_distances.sort(key=lambda x: x[1])
                 
-                if face_distances and face_distances[0][1] < 0.6:
+                if face_distances and face_distances[0][1] < 0.5:
                     results.append(face_distances[0][0])
                 else:
                     results.append(Student(name="Không xác định"))
@@ -244,7 +249,7 @@ def recognize_video():
                     "email": getattr(student, "email", "Không có email"),
                     "phone": getattr(student, "phone", "Không có số điện thoại"),
                 }
-                time.sleep(2)
+                time.sleep(10)
                 try:
                     os.remove(temp_file.name)
                 except:
@@ -255,70 +260,11 @@ def recognize_video():
         except Exception as e:
             return jsonify({"success": False, "message": f"Lỗi xử lý: {str(e)}"})
 
-# @view.route('/recognize_camera', methods=['GET', 'POST'])
-# def recognize_camera():
-#     if request.method == 'GET':
-#         return render_template('recognize_camera.html')
-#     try:
-#         # Lấy dữ liệu ảnh từ request
-#         image_data = request.get_data()
-#         image_data = image_data.split(b',')[1]  # Bỏ qua phần header của base64
-#         image_bytes = base64.b64decode(image_data)
-        
-#         # Chuyển đổi bytes thành ảnh PIL
-#         image = Image.open(io.BytesIO(image_bytes))
-        
-#         # Chuyển đổi PIL Image thành numpy array
-#         image_array = np.array(image)
-        
-#         # Tìm khuôn mặt trong ảnh
-#         face_encodings = face_recognition.face_encodings(image_array)
-        
-#         if not face_encodings:
-#             return jsonify({'results': ["Không tìm thấy khuôn mặt"]})
-        
-#         known_faces = Student.query.all()
-        
-#         results = []
-#         for i, face_encoding in enumerate(face_encodings):
-#             # Tính khoảng cách với tất cả khuôn mặt đã biết
-#             face_distances = []
-#             for known_face in known_faces:
-#                 distance = face_recognition.face_distance([known_face.face_encoding], face_encoding)[0]
-#                 face_distances.append((known_face.name, distance))
-            
-#             # Sắp xếp theo khoảng cách (khoảng cách nhỏ hơn = khớp hơn)
-#             face_distances.sort(key=lambda x: x[1])
-            
-#             # Sử dụng ngưỡng 0.6 (thấp hơn = chính xác hơn)
-#             if face_distances and face_distances[0][1] < 0.6:
-#                 name = face_distances[0][0]
-#                 results.append(f"{name}:{i}")  # Thêm ID vào kết quả
-#             else:
-#                 results.append(f"Không nhận diện được:{i}")
-        
-#         # Chuyển văn bản thành giọng nói nếu có kết quả
-#         if results:
-#             names = [r.split(':')[0] for r in results if r.split(':')[0] != "Không nhận diện được"]
-#             if names:
-#                 joined_names = " và ".join(names)
-#                 message = f"Xin chào! {joined_names}."
-#                 temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
-#                 temp_file.close()
-#                 tts = gTTS(text=message, lang='vi')
-#                 tts.save(temp_file.name)
-#                 subprocess.Popen(["start", temp_file.name], shell=True)
-#                 time.sleep(2)
-#                 try:
-#                     os.remove(temp_file.name)
-#                 except:
-#                     pass
-#         return jsonify({'results': results})
-        
-#     except Exception as e:
-#         print(f"Lỗi khi xử lý ảnh từ camera: {str(e)}")
-#         return jsonify({'results': ["Có lỗi xảy ra khi xử lý ảnh"]})
-
+@view.route('/recognize_camera', methods=['GET', 'POST'])
+def recognize_camera():
+    if request.method == 'GET':
+        return render_template('recognize_camera.html')
+    
 @view.route('/student_mng', methods=['GET'])
 def student_mng():
     inspector = inspect(db.engine)
@@ -326,3 +272,11 @@ def student_mng():
         Student.__table__.create(db.engine)
     students = Student.query.all()
     return render_template('student_mng.html', students=students)
+
+@view.route('/room_allocation_exam', methods=['GET'])
+def room_allocation_exam():
+    return render_template('room_allocation_exam.html')
+
+
+
+    

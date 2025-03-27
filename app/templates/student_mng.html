@@ -121,12 +121,26 @@
                                                             Xác thực
                                                         </button>
                                                     </div>
+                                                    <div class="authenticate">
+                                                        <button class="btn btn-sm btn-success authenticate"
+                                                            data-id="{{ student.id }}" data-bs-toggle="modal"
+                                                            data-bs-target="#authenticateModal">
+                                                            Xác thực video
+                                                        </button>
+                                                    </div>
                                                     {% else %}
                                                     <div class="authenticate">
                                                         <button class="btn btn-sm btn-danger authenticate"
                                                             data-id="{{ student.id }}" data-bs-toggle="modal"
                                                             data-bs-target="#authenticateModal">
                                                             Xác thực
+                                                        </button>
+                                                    </div>
+                                                    <div class="authenticate">
+                                                        <button class="btn btn-sm btn-danger authenticate"
+                                                            data-id="{{ student.id }}" data-bs-toggle="modal"
+                                                            data-bs-target="#authenticateModal">
+                                                            Xác thực video
                                                         </button>
                                                     </div>
                                                     {% endif %}
@@ -166,66 +180,47 @@
         </div>
         <!-- end row -->
 
-        <div class="modal fade" id="showModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <!-- Modal -->
+        <div class="modal fade" id="authenticateModal" tabindex="-1" aria-labelledby="authenticateModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header bg-light p-3">
-                        <h5 class="modal-title" id="exampleModalLabel"></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                            id="close-modal"></button>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="authenticateModalLabel">Xác thực khuôn mặt</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form class="tablelist-form" id="add-student-form" autocomplete="off" method="POST"
-                            action="{{ url_for('view.add_student') }}">
-                            <div class="mb-3" id="modal-id" style="display: none;">
-                                <label for="id-field" class="form-label">ID</label>
-                                <input type="text" id="id-field" class="form-control" placeholder="ID" readonly />
-                            </div>
-
+                        <form id="authenticateForm" enctype="multipart/form-data" onsubmit="return false;">
+                            <input type="hidden" id="student_id" name="student_id">
                             <div class="mb-3">
-                                <label for="name-field" class="form-label">Họ và tên</label>
-                                <input type="text" id="name-field" name="name" class="form-control"
-                                    placeholder="Nhập họ và tên" required />
-                                <div class="invalid-feedback">Nhập họ và tên.</div>
+                                <label for="file" class="form-label">Chọn ảnh khuôn mặt</label>
+                                <input type="file" class="form-control" id="file" name="file" accept="image/*" required>
+                                <div class="invalid-feedback">Vui lòng chọn một ảnh.</div>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="student_code-field" class="form-label">Mã sinh viên</label>
-                                <input type="text" id="student_code-field" name="student_code" class="form-control"
-                                    placeholder="Nhập mã sinh viên" required />
-                                <div class="invalid-feedback">Nhập mã sinh viên.</div>
+                            <div class="text-center mb-3">
+                                <video id="video" width="100%" autoplay style="display: none;"></video>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="student_identifier-field" class="form-label">Số căn cước công dân</label>
-                                <input type="text" id="student_identifier-field" name="student_identifier"
-                                    class="form-control" placeholder="Nhập số căn cước công dân" required />
-                                <div class="invalid-feedback">Nhập số căn cước công dân.</div>
+                            <div class="text-center">
+                                <button type="button" id="startCamera" class="btn btn-primary">
+                                    <i class="ri-camera-line"></i> Sử dụng Camera
+                                </button>
+                                <button type="button" id="captureBtn" class="btn btn-success" style="display: none;">
+                                    <i class="ri-camera-fill"></i> Chụp ảnh
+                                </button>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="email-field" class="form-label">Email</label>
-                                <input type="email" id="email-field" name="email" class="form-control"
-                                    placeholder="Nhập email" required />
-                                <div class="invalid-feedback">Nhập email.</div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="phone-field" class="form-label">Số điện thoại</label>
-                                <input type="text" id="phone-field" name="phone" class="form-control"
-                                    placeholder="Nhập số điện thoại." required />
-                                <div class="invalid-feedback">Nhập số điện thoại.</div>
+                            <div id="imagePreview" class="text-center mb-3" style="display: none;">
+                                <img id="previewImage" class="img-fluid rounded" style="max-height: 200px;">
                             </div>
                         </form>
+                        <div id="authMessage" class="mt-2"></div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
-                        <button type="submit" class="btn btn-success" id="add-btn">Thêm sinh viên</button>
+                    <div class="modal-footer" style="display: flex; justify-content: center;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-primary" id="submitAuthenticate">Xác nhận</button>
                     </div>
                 </div>
             </div>
         </div>
-
         <!-- Modal -->
         <div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -252,43 +247,187 @@
             </div>
         </div>
         <!--end modal -->
-
-        <!-- Add this modal before the closing body tag -->
-        <div class="modal fade" id="authenticateModal" tabindex="-1" aria-labelledby="authenticateModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="authenticateModalLabel">Xác thực khuôn mặt</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="authenticateForm" enctype="multipart/form-data" onsubmit="return false;">
-                            <input type="hidden" id="student_id" name="student_id">
-                            <div class="mb-3">
-                                <label for="file" class="form-label">Chọn ảnh khuôn mặt</label>
-                                <input type="file" class="form-control" id="file" name="file" accept="image/*" required>
-                                <div class="invalid-feedback">Vui lòng chọn một ảnh.</div>
-                            </div>
-                            <div id="imagePreview" class="text-center mb-3" style="display: none;">
-                                <img id="previewImage" class="img-fluid rounded" style="max-height: 200px;">
-                            </div>
-                        </form>
-                        <div id="authMessage" class="mt-2"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="button" class="btn btn-primary" id="submitAuthenticate">Xác nhận</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
     </div>
     <!-- container-fluid -->
 </div>
+<style>
+    /* Nền mờ phủ toàn màn hình */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        /* Nền mờ */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        /* Đảm bảo nằm trên cùng */
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    /* Hiển thị modal chính giữa */
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 400px;
+        text-align: center;
+        position: relative;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Nút đóng modal */
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Khi mở modal */
+    .modal-overlay.show {
+        visibility: visible;
+        opacity: 1;
+    }
+</style>
 <script>
+    let stream = null;
+    const video = document.getElementById('video');
+    const startButton = document.getElementById('startCamera');
+    const captureButton = document.getElementById('captureBtn');
+    const previewImage = document.getElementById('previewImage');
+    const imagePreview = document.getElementById('imagePreview');
+    const submitButton = document.getElementById('submitAuthenticate');
+    const fileInput = document.getElementById('file');
+    let capturedImageBlob = null;
+
+    // Khi nhấn nút "Xác thực", lấy student.id và hiển thị modal
+    document.querySelectorAll(".authenticate button").forEach(button => {
+        button.addEventListener("click", function () {
+            let studentId = this.getAttribute("data-id");
+            document.getElementById("student_id").value = studentId;
+        });
+    });
+
+    // Hiển thị ảnh xem trước khi chọn file
+    fileInput.addEventListener("change", function (event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("previewImage").src = e.target.result;
+                document.getElementById("imagePreview").style.display = "block";
+                capturedImageBlob = file;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    startButton.addEventListener('click', async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            video.style.display = 'block';
+            startButton.style.display = 'none';
+            captureButton.style.display = 'inline-block';
+            fileInput.style.display = 'none';
+        } catch (err) {
+            console.error('Error accessing camera:', err);
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Không thể truy cập camera. Vui lòng kiểm tra lại quyền truy cập.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+
+    captureButton.addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        // Convert canvas to blob
+        canvas.toBlob(blob => {
+            capturedImageBlob = blob;
+            previewImage.src = canvas.toDataURL('image/jpeg');
+            imagePreview.style.display = 'block';
+            // Ẩn video và nút chụp sau khi chụp xong
+            video.style.display = 'none';
+            captureButton.style.display = 'none';
+            // Hiện lại nút bật camera
+            startButton.style.display = 'inline-block';
+            // Dừng camera stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }, 'image/jpeg');
+    });
+
+    submitButton.addEventListener('click', function () {
+        if (!capturedImageBlob) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Vui lòng chọn ảnh hoặc chụp ảnh trước khi xác nhận.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        let studentId = document.getElementById("student_id").value;
+        let formData = new FormData();
+        formData.append("student_id", studentId);
+        formData.append("file", capturedImageBlob, 'capture.jpg');
+
+        fetch("/add_face", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            let messageDiv = document.getElementById("authMessage");
+            messageDiv.innerHTML = data.message;
+            if (data.success) {
+                messageDiv.className = "mt-2 alert alert-success";
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } else {
+                messageDiv.className = "mt-2 alert alert-danger";
+            }
+        })
+        .catch(error => {
+            let messageDiv = document.getElementById("authMessage");
+            messageDiv.innerHTML = "Có lỗi xảy ra: " + error;
+            messageDiv.className = "mt-2 alert alert-danger";
+        });
+    });
+
+    // Clean up when modal is closed
+    document.getElementById('authenticateModal').addEventListener('hidden.bs.modal', function () {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+        startButton.style.display = 'inline-block';
+        captureButton.style.display = 'none';
+        video.style.display = 'none';
+        fileInput.style.display = 'block';
+        imagePreview.style.display = 'none';
+        previewImage.src = '';
+        capturedImageBlob = null;
+    });
+
     document.getElementById('fileInput').addEventListener('change', function (event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -315,73 +454,9 @@
             });
     });
 
-    document.addEventListener("DOMContentLoaded", function () {
-        // Khi nhấn nút "Xác thực", lấy student.id và hiển thị modal
-        document.querySelectorAll(".authenticate button").forEach(button => {
-            button.addEventListener("click", function () {
-                let studentId = this.getAttribute("data-id");
-                document.getElementById("student_id").value = studentId; // Gán student_id vào input ẩn
-            });
-        });
-
-        // Hiển thị ảnh xem trước
-        document.getElementById("file").addEventListener("change", function (event) {
-            let file = event.target.files[0];
-            if (file) {
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById("previewImage").src = e.target.result;
-                    document.getElementById("imagePreview").style.display = "block";
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Gửi form bằng AJAX
-        document.getElementById("submitAuthenticate").addEventListener("click", function () {
-            let studentId = document.getElementById("student_id").value;
-            let fileInput = document.getElementById("file");
-            let file = fileInput.files[0];
-
-            if (!file) {
-                alert("Vui lòng chọn một ảnh.");
-                return;
-            }
-
-            let formData = new FormData();
-            formData.append("student_id", studentId);
-            formData.append("file", file);
-
-            fetch("/add_face", {
-                method: "POST",
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    let messageDiv = document.getElementById("authMessage");
-                    messageDiv.innerHTML = data.message;
-                    if (data.success) {
-                        messageDiv.className = "mt-2 alert alert-success";
-                        setTimeout(() => {
-                            location.reload();  // Refresh trang sau 2 giây nếu thành công
-                        }, 2000);
-                    } else {
-                        messageDiv.className = "mt-2 alert alert-danger";
-                    }
-                })
-                .catch(error => {
-                    let messageDiv = document.getElementById("authMessage");
-                    messageDiv.innerHTML = "Có lỗi xảy ra: " + error;
-                    messageDiv.className = "mt-2 alert alert-danger";
-                });
-        });
-    });
-
-
     document.getElementById("add-btn").addEventListener("click", function (event) {
         event.preventDefault(); // Ngăn chặn hành vi mặc định của nút
         document.getElementById("add-student-form").submit(); // Submit form bằng JavaScript
     });
 </script>
-
 {% endblock %}

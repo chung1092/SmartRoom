@@ -6,12 +6,11 @@
         <div class="row">
             <div class="col-12">
                 <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
-                    <h4 class="mb-sm-0">Nhận diện sinh viên từ video</h4>
-
+                    <h4 class="mb-sm-0">Xác thực khuôn mặt</h4>
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">AI</a></li>
-                            <li class="breadcrumb-item active">Nhận diện sinh viên từ video</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">Xác thực</a></li>
+                            <li class="breadcrumb-item active">Xác thực khuôn mặt</li>
                         </ol>
                     </div>
                 </div>
@@ -20,64 +19,31 @@
         <!-- end page title -->
 
         <div class="row">
-            <!-- Left Column - Image Upload -->
-            <div class="col-md-6 mb-4">
-                <div class="card">
+            <!-- Left Column - Camera Feed -->
+            <div class="col-lg-6">
+                <div class="card h-100">
                     <div class="card-header">
-                        <h4 class="text-center">Camera Laptop - Nhận Diện</h4>
+                        <h4 class="card-title mb-0">Camera xác thực</h4>
                     </div>
-                    <div class="card-body">
-                        <div class="text-center mb-3">
-                            <video id="laptopVideo" width="320" height="240" autoplay></video>
+                    <div class="card-body d-flex flex-column">
+                        <div class="video-container mb-3 flex-grow-1">
+                            <video id="video" width="100%" autoplay playsinline></video>
                         </div>
                         <div class="text-center">
-                            <button id="startLaptopCamera" class="btn btn-primary">Bật Camera Laptop</button>
-                            <button id="stopLaptopCamera" class="btn btn-danger" disabled>Dừng Camera Laptop</button>
-                        </div>
-                        <div id="laptopResults" class="mt-3">
-                            <h5>Kết quả nhận diện:</h5>
-                            <div id="laptopRecognitionResults" class="list-group">
-                                <!-- Kết quả sẽ được hiển thị ở đây -->
-                            </div>
+                            <button type="button" class="btn btn-danger" id="stopCamera">
+                                <i class="ri-camera-off-line"></i> Tắt Camera
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Camera Ngoài - Truy Vết -->
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="text-center">Camera Ngoài - Truy Vết</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="text-center mb-3">
-                            <video id="webcamVideo" width="320" height="240" autoplay></video>
-                        </div>
-                        <div class="text-center mb-3">
-                            <select id="cameraSelect" class="form-control">
-                                <option value="">Chọn camera...</option>
-                            </select>
-                        </div>
-                        <div class="text-center">
-                            <button id="startWebcam" class="btn btn-primary">Bật Camera</button>
-                            <button id="stopWebcam" class="btn btn-danger" disabled>Dừng Camera</button>
-                        </div>
-                        <div id="webcamResults" class="mt-3">
-                            <h5>Kết quả truy vết:</h5>
-                            <div id="webcamRecognitionResults" class="list-group">
-                                <!-- Kết quả sẽ được hiển thị ở đây -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
             <!-- Right Column - Student Information Form -->
-            <!-- <div class="col-lg-6">
-                <div class="card">
+            <div class="col-lg-6">
+                <div class="card h-100">
                     <div class="card-header">
                         <h4 class="card-title mb-0">Thông tin sinh viên</h4>
                     </div>
-
                     <div class="card-body">
                         <form class="tablelist-form" autocomplete="off">
                             <div class="mb-3" id="modal-id" style="display: none;">
@@ -115,13 +81,13 @@
 
                             <div class="text-center">
                                 <button type="button" class="btn btn-danger" onclick="showDeleteModal()">
-                                    <i class="ri-delete-bin-line"></i> Delete Record
+                                    <i class="ri-delete-bin-line"></i> Xóa thông tin
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
-            </div> -->
+            </div>
             <div class="col-lg-12">
                 <div id="authMessage" class="mt-2"></div>
             </div>
@@ -143,7 +109,7 @@
                         colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
                     <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
                         <h4>Bạn có chắc ?</h4>
-                        <p class="text-muted mx-4 mb-0">Bạn có chắc là bạn muốn xóa bản ghi này không ?</p>
+                        <p class="text-muted mx-4 mb-0">Bạn có chắc là bạn muốn xóa thông tin sinh viên này không ?</p>
                     </div>
                 </div>
                 <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
@@ -156,282 +122,228 @@
 </div>
 
 <style>
-    .dropzone {
+    .video-container {
         position: relative;
-        min-height: 300px;
-        border: 2px dashed #dee2e6;
-        border-radius: 0.5rem;
-        padding: 20px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        width: 100%;
+        height: 400px;
+        margin: 0 auto;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background: #000;
     }
 
-    .dropzone:hover,
-    .dropzone.border-primary {
-        border-color: #556ee6;
-        background-color: rgba(85, 110, 230, 0.05);
+    #video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
     }
 
-    .preview-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: white;
-        padding: 20px;
+    .card {
+        height: 100%;
+    }
+
+    .card-body {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
     }
 
-    .preview-overlay img {
-        max-height: 250px;
-        width: auto;
-        object-fit: contain;
+    .tablelist-form {
+        flex-grow: 1;
     }
 
-    .preview-controls {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
+    .alert {
+        margin-bottom: 0;
     }
 
-    .dz-message {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 100%;
+    .highlight {
+        animation: highlight 1s ease-in-out;
     }
 
-    #imagePreview {
-        width: 100%;
-        /* Chiếm toàn bộ chiều rộng của div chứa */
-        max-width: 500px;
-        /* Giới hạn chiều rộng tối đa, tùy chỉnh theo ý bạn */
-        max-height: 300px;
-        /* Giới hạn chiều cao tối đa */
-        overflow: hidden;
-        /* Ẩn phần vượt quá */
-        position: relative;
-    }
-
-    #previewImage {
-        width: 100%;
-        /* Video tự động co dãn theo div */
-        height: auto;
-        /* Đảm bảo tỷ lệ video không bị méo */
-        display: block;
-        object-fit: cover;
-        /* Cắt video nếu cần, giữ nội dung nằm gọn */
-        border-radius: 10px;
-        /* Bo góc đẹp hơn */
+    @keyframes highlight {
+        0% {
+            background-color: #fff;
+        }
+        50% {
+            background-color: #e3f2fd;
+        }
+        100% {
+            background-color: #fff;
+        }
     }
 </style>
 
 <script>
-    // Camera Laptop
-    let laptopVideo = document.getElementById('laptopVideo');
-    let startLaptopButton = document.getElementById('startLaptopCamera');
-    let stopLaptopButton = document.getElementById('stopLaptopCamera');
-    let laptopStream = null;
-    let laptopRecognitionInterval = null;
-    let recognizedFaces = new Set(); // Lưu trữ các khuôn mặt đã nhận diện
+    let stream = null;
+    let scanInterval = null;
+    const video = document.getElementById('video');
+    const stopButton = document.getElementById('stopCamera');
+    let lastRecognizedId = null;
+    let isProcessing = false;
 
-    // Camera Ngoài
-    let webcamVideo = document.getElementById('webcamVideo');
-    let startWebcamButton = document.getElementById('startWebcam');
-    let stopWebcamButton = document.getElementById('stopWebcam');
-    let cameraSelect = document.getElementById('cameraSelect');
-    let webcamStream = null;
-    let webcamRecognitionInterval = null;
-
-    let lastAnnouncement = {}; // Lưu thời điểm thông báo cuối cùng cho mỗi người
-
-    // Lấy danh sách camera khi trang được tải
-    async function getCameraList() {
+    // Hàm bắt đầu camera
+    async function startCamera() {
         try {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const videoDevices = devices.filter(device => device.kind === 'videoinput');
-
-            // Xóa các tùy chọn cũ
-            cameraSelect.innerHTML = '<option value="">Chọn camera...</option>';
-
-            // Thêm các camera vào danh sách
-            videoDevices.forEach(device => {
-                const option = document.createElement('option');
-                option.value = device.deviceId;
-                option.text = device.label || `Camera ${cameraSelect.length}`;
-                cameraSelect.appendChild(option);
-            });
-        } catch (err) {
-            console.error('Lỗi khi lấy danh sách camera:', err);
-        }
-    }
-
-    // Gọi hàm lấy danh sách camera khi trang được tải
-    getCameraList();
-
-    // Xử lý Camera Laptop
-    startLaptopButton.addEventListener('click', async () => {
-        try {
-            laptopStream = await navigator.mediaDevices.getUserMedia({
+            stream = await navigator.mediaDevices.getUserMedia({
                 video: {
-                    deviceId: 'default',
-                    facingMode: 'user'
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
                 }
             });
-            laptopVideo.srcObject = laptopStream;
-            startLaptopButton.disabled = true;
-            stopLaptopButton.disabled = false;
-
-            // Bắt đầu nhận diện khuôn mặt
-            laptopRecognitionInterval = setInterval(() => recognizeFace('laptop'), 1000);
+            video.srcObject = stream;
+            startScanning();
         } catch (err) {
-            console.error('Lỗi khi truy cập camera laptop:', err);
-            alert('Không thể truy cập camera laptop. Vui lòng kiểm tra quyền truy cập.');
+            console.error('Error accessing camera:', err);
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Không thể truy cập camera. Vui lòng kiểm tra lại quyền truy cập.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
         }
-    });
+    }
 
-    stopLaptopButton.addEventListener('click', () => {
-        if (laptopStream) {
-            laptopStream.getTracks().forEach(track => track.stop());
-            laptopVideo.srcObject = null;
-            startLaptopButton.disabled = false;
-            stopLaptopButton.disabled = true;
-            clearInterval(laptopRecognitionInterval);
-        }
-    });
+    // Hàm quét khuôn mặt với YOLO
+    function startScanning() {
+        scanInterval = setInterval(async () => {
+            if (isProcessing) return;
 
-    // Xử lý Camera Ngoài
-    startWebcamButton.addEventListener('click', async () => {
-        const selectedDeviceId = cameraSelect.value;
-        if (!selectedDeviceId) {
-            alert('Vui lòng chọn camera từ danh sách');
-            return;
-        }
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
 
-        try {
-            webcamStream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    deviceId: selectedDeviceId
+            try {
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
+                const formData = new FormData();
+                formData.append('file', blob, 'scan.jpg');
+
+                isProcessing = true;
+
+                // Gửi request trực tiếp đến /recognize
+                const response = await fetch('/recognize', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                console.log('Response data:', data); // Thêm log để debug
+
+                if (data.success && data.student) {
+                    // Update student information form with the recognized data
+                    const studentData = {
+                        'id-field': data.student.id,
+                        'customername-field': data.student.name,
+                        'text': data.student.student_code,
+                        'email-field': data.student.email,
+                        'phone-field': data.student.phone
+                    };
+                    console.log('Updating form with:', studentData); // Thêm log để debug
+                    updateStudentInfo(studentData);
+
+                    // Cập nhật ID sinh viên đã nhận diện
+                    lastRecognizedId = data.student.id;
+
+                    // Show success message
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: `Đã nhận diện sinh viên: ${data.student.name}`,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+
+                    // Dừng quét sau khi xác thực thành công
+                    stopScanning();
+                } else {
+                    lastRecognizedId = null;
                 }
-            });
-            webcamVideo.srcObject = webcamStream;
-            startWebcamButton.disabled = true;
-            stopWebcamButton.disabled = false;
-            cameraSelect.disabled = true;
-
-            // Bắt đầu truy vết khuôn mặt
-            webcamRecognitionInterval = setInterval(() => trackFace(), 1000);
-        } catch (err) {
-            console.error('Lỗi khi truy cập camera:', err);
-            alert('Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.');
-        }
-    });
-
-    stopWebcamButton.addEventListener('click', () => {
-        if (webcamStream) {
-            webcamStream.getTracks().forEach(track => track.stop());
-            webcamVideo.srcObject = null;
-            startWebcamButton.disabled = false;
-            stopWebcamButton.disabled = true;
-            cameraSelect.disabled = false;
-            clearInterval(webcamRecognitionInterval);
-        }
-    });
-
-    async function recognizeFace(cameraType) {
-        const video = cameraType === 'laptop' ? laptopVideo : webcamVideo;
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-
-        try {
-            const response = await fetch('/recognize_camera', {
-                method: 'POST',
-                body: canvas.toDataURL('image/jpeg')
-            });
-
-            const data = await response.json();
-            if (data.results && data.results.length > 0) {
-                // Cập nhật danh sách khuôn mặt đã nhận diện
-                data.results.forEach(result => {
-                    const [name, id] = result.split(':');
-                    if (name !== "Không nhận diện được") {
-                        recognizedFaces.add(id);  // Lưu ID thay vì tên
-                    }
-                });
-                updateResults(cameraType, data.results);
+            } catch (error) {
+                console.error('Error scanning:', error);
+                lastRecognizedId = null;
+            } finally {
+                isProcessing = false;
             }
-        } catch (err) {
-            console.error('Lỗi khi gửi ảnh:', err);
+        }, 2000); // Gửi request mỗi 2 giây
+    }
+
+    // Hàm dừng quét
+    function stopScanning() {
+        if (scanInterval) {
+            clearInterval(scanInterval);
+            scanInterval = null;
         }
     }
 
-    async function trackFace() {
-        const canvas = document.createElement('canvas');
-        canvas.width = webcamVideo.videoWidth;
-        canvas.height = webcamVideo.videoHeight;
-        canvas.getContext('2d').drawImage(webcamVideo, 0, 0);
-
-        try {
-            const response = await fetch('/track_face', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    image: canvas.toDataURL('image/jpeg'),
-                    recognized_faces: Array.from(recognizedFaces)
-                })
-            });
-
-            const data = await response.json();
-            if (data.results && data.results.length > 0) {
-                updateResults('webcam', data.results);
-
-                // Xử lý thông báo liên tục
-                const currentTime = Date.now();
-                data.results.forEach(result => {
-                    if (result.startsWith("Đang theo dõi:") || result.startsWith("Phát hiện đối tượng mới:")) {
-                        const id = result.split(": ")[1];
-                        // Chỉ thông báo nếu đã qua 5 giây kể từ lần thông báo cuối
-                        if (!lastAnnouncement[id] || currentTime - lastAnnouncement[id] > 5000) {
-                            // Gửi yêu cầu thông báo
-                            fetch('/announce_tracking', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    id: id
-                                })
-                            });
-                            lastAnnouncement[id] = currentTime;
-                        }
-                    }
-                });
-            }
-        } catch (err) {
-            console.error('Lỗi khi gửi ảnh:', err);
+    // Hàm dừng camera
+    function stopCamera() {
+        stopScanning();
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
         }
-    }
-
-    function updateResults(cameraType, results) {
-        const resultsDiv = document.getElementById(`${cameraType}RecognitionResults`);
-        resultsDiv.innerHTML = '';
-
-        results.forEach(result => {
-            const div = document.createElement('div');
-            div.className = 'list-group-item';
-            div.textContent = result;
-            resultsDiv.appendChild(div);
+        video.srcObject = null;
+        stopButton.style.display = 'none';
+        lastRecognizedId = null; // Reset lastRecognizedId khi tắt camera
+        Swal.fire({
+            title: 'Camera đã tắt',
+            text: 'Nhấn nút "Bật Camera" để tiếp tục.',
+            icon: 'info',
+            confirmButtonText: 'OK'
         });
     }
+
+    function updateStudentInfo(data) {
+        console.log('Updating form fields with:', data); // Thêm log để debug
+        // Cập nhật tất cả các trường thông tin
+        Object.keys(data).forEach(key => {
+            const input = document.getElementById(key);
+            if (input) {
+                console.log(`Updating field ${key} with value:`, data[key]); // Thêm log để debug
+                input.value = data[key];
+                // Thêm hiệu ứng highlight khi cập nhật
+                input.classList.add('highlight');
+                setTimeout(() => {
+                    input.classList.remove('highlight');
+                }, 1000);
+            } else {
+                console.log(`Field ${key} not found in form`); // Thêm log để debug
+            }
+        });
+    }
+
+    function clearStudentInfo() {
+        // Clear all form fields
+        const form = document.querySelector('.tablelist-form');
+        const inputs = form.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.value = '';
+        });
+        lastRecognizedId = null; // Reset lastRecognizedId khi xóa thông tin
+    }
+
+    function showDeleteModal() {
+        const modal = new bootstrap.Modal(document.getElementById('deleteRecordModal'));
+        modal.show();
+    }
+
+    // Event listeners
+    stopButton.addEventListener('click', stopCamera);
+
+    // Handle delete confirmation
+    document.getElementById('delete-record').addEventListener('click', function () {
+        clearStudentInfo();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteRecordModal'));
+        modal.hide();
+    });
+
+    // Bắt đầu camera khi trang được tải
+    document.addEventListener('DOMContentLoaded', startCamera);
+
+    // Cleanup khi rời trang
+    window.addEventListener('beforeunload', () => {
+        stopCamera();
+    });
 </script>
 {% endblock %}
