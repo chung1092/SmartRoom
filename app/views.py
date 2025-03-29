@@ -188,7 +188,6 @@ def add_face():
         os.remove(filepath)
         return jsonify({"success": False, "message": message})
         
-name = ""
 @view.route('/recognize', methods=['GET', 'POST'])
 def recognize():
     global name
@@ -207,41 +206,36 @@ def recognize():
         if not face_encodings:
             return render_template('recognize.html')
         results = distance_face(face_encodings)
+        student = results[0]
         joined_names = " và ".join([r.full_name for r in results])
         if joined_names == "Không xác định":
             message = "Không xác định"
+            student.full_name = "Không xác định"
         else:
             message = f"Xin chào! {joined_names}."
-        if name != joined_names:
-            name = joined_names
-            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
-            temp_file.close()
-            tts = gTTS(text=message, lang='vi')
-            tts.save(temp_file.name)
-            subprocess.Popen(["start", temp_file.name], shell=True)
-        if results and isinstance(results[0], Student):
-            student = results[0]
-            class_name = "Không có lớp hành chính"
             for class_ in Class.query.all():
                 if class_.class_id == student.class_id:
                     class_name = class_.class_name
                     break
-            student_data = {
-                "student_id": student.student_id,
-                "full_name": student.full_name,
-                "student_code": student.student_code,
-                "student_identifier": student.student_identifier,
-                "email": student.email if student.email else "NULL",
-                "gender": "Nam" if student.gender == 1 else "Nữ",
-                "class_name": class_name,
-                "phone": student.phone if student.phone else "NULL",
-                "image_path": student.image_path if student.image_path else "NULL",
-            }
-            if joined_names != name:
-                os.remove(temp_file.name)
-            return jsonify({"success": True, "student": student_data})
-        else:
-            return jsonify({"success": False, "message": "Không tìm thấy sinh viên"})
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+        temp_file.close()
+        tts = gTTS(text=message, lang='vi')
+        tts.save(temp_file.name)
+        subprocess.Popen(["start", temp_file.name], shell=True)
+        student_data = {
+            "student_id": student.student_id,
+            "full_name": student.full_name,
+            "student_code": student.student_code,
+            "student_identifier": student.student_identifier,
+            "email": student.email if student.email else "NULL",
+            "gender": "Nam" if student.gender == 1 else "Nữ",
+            "class_name": class_name,
+            "phone": student.phone if student.phone else "NULL",
+            "image_path": student.image_path if student.image_path else "NULL",
+        }
+        os.remove(temp_file.name)
+        return jsonify({"success": True, "student": student_data})
+    return jsonify({"success": False, "message": "Lỗi tải ảnh lên"})
 
 @view.route('/recognize_video', methods=['GET', 'POST'])
 def recognize_video():
@@ -267,50 +261,39 @@ def recognize_video():
             if not face_encodings:
                 return render_template('recognize_video.html')
             results = distance_face(face_encodings)
-            joined_names = " và ".join([r.full_name for r in results])
+            student = results[0]
             if joined_names == "Không xác định":
                 message = "Không xác định"
+                student.full_name = "Không xác định"
+
             else:
                 message = f"Xin chào! {joined_names}."
+                for class_ in Class.query.all():
+                    if class_.class_id == student.class_id:
+                        class_name = class_.class_name
+                        break
+            joined_names = " và ".join([r.full_name for r in results])
             temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
             temp_file.close()
             tts = gTTS(text=message, lang='vi')
             tts.save(temp_file.name)
             subprocess.Popen(["start", temp_file.name], shell=True)
-            if results and isinstance(results[0], Student):
-                student = results[0]
-                print("Student ID:", student.student_id)
-                print("Student Code:", student.student_code)
-                print("Student Identifier:", student.student_identifier)
-                print("Full Name:", student.full_name)
-                print("Class ID:", student.class_id)
-                print("Date of Birth:", student.date_of_birth)
-                print("Gender:", student.gender)
-                print("Email:", student.email)
-                print("Phone:", student.phone)
-                print("Image Path:", student.image_path)
-                for class_ in Class.query.all():
-                    if class_.class_id == student.class_id:
-                        class_name = class_.class_name
-                        break
-                student_data = {
-                    "student_id": student.student_id,
-                    "full_name": student.full_name,
-                    "student_code": student.student_code,
-                    "student_identifier": student.student_identifier,
-                    "email": student.email if student.email else "NULL",
-                    "gender": "Nam" if student.gender == 1 else "Nữ",
-                    "class_name": class_name,
-                    "phone": student.phone if student.phone else "NULL",
-                    "image_path": student.image_path if student.image_path else "NULL",
-                }
-                if joined_names != name:
-                    os.remove(temp_file.name)
-                return jsonify({"success": True, "student": student_data})
-            else:
-                return jsonify({"success": False, "message": "Không tìm thấy sinh viên"})
+            student_data = {
+                "student_id": student.student_id,
+                "full_name": student.full_name,
+                "student_code": student.student_code,
+                "student_identifier": student.student_identifier,
+                "email": student.email if student.email else "NULL",
+                "gender": "Nam" if student.gender == 1 else "Nữ",
+                "class_name": class_name,
+                "phone": student.phone if student.phone else "NULL",
+                "image_path": student.image_path if student.image_path else "NULL",
+            }
+            os.remove(temp_file.name)
+            return jsonify({"success": True, "student": student_data})
         except Exception as e:
             return jsonify({"success": False, "message": f"Lỗi xử lý: {str(e)}"})
+    return jsonify({"message": "Lỗi up video!", "success": False})
 
 @view.route('/recognize_camera', methods=['GET', 'POST'])
 def recognize_camera():
