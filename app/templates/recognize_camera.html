@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-content">
+    <div class="container-fluid">
+        <!-- start page title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
+                    <h4 class="mb-sm-0">Xác thực khuôn mặt</h4>
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">Xác thực</a></li>
+                            <li class="breadcrumb-item active">Xác thực khuôn mặt</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end page title -->
+
+        <div class="row">
+            <!-- Left Column - Camera Feed -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Camera xác thực</h4>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="video-container mb-3 flex-grow-1">
+                            <video id="video" width="100%" autoplay playsinline></video>
+                        </div>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-danger" id="stopCamera">
+                                <i class="ri-camera-off-line"></i> Tắt Camera
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Student Information Form -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Thông tin sinh viên</h4>
+                    </div>
+                    <div class="card-body">
+                        <form class="tablelist-form" autocomplete="off">
+                            <div class="mb-3" id="modal-id">
+                                <img id="image-field" style="display: none; width: 20%; height: auto;" class="img-fluid rounded" alt="Preview">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="customername-field" class="form-label">Họ và tên</label>
+                                <input type="text" id="customername-field" class="form-control" readonly />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="text" class="form-label">Mã sinh viên</label>
+                                <input type="text" id="text" class="form-control" readonly/>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="identifier-field" class="form-label">Mã định danh</label>
+                                <input type="text" id="identifier-field" class="form-control" readonly />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="class-field" class="form-label">Lớp hành chính</label>
+                                <input type="text" id="class-field" class="form-control" readonly/>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="gender-field" class="form-label">Giới tính</label>
+                                <input type="text" id="gender-field" class="form-control" readonly/>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email-field" class="form-label">Email</label>
+                                <input type="email" id="email-field" class="form-control" readonly/>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="phone-field" class="form-label">Số điện thoại</label>
+                                <input type="text" id="phone-field" class="form-control" readonly/>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="button" class="btn btn-danger" onclick="showDeleteModal()">
+                                    <i class="ri-delete-bin-line"></i> Delete Record
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div id="authMessage" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    id="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mt-2 text-center">
+                    <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
+                        colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
+                    <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                        <h4>Bạn có chắc ?</h4>
+                        <p class="text-muted mx-4 mb-0">Bạn có chắc là bạn muốn xóa thông tin sinh viên này không ?</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+                    <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn w-sm btn-danger" id="delete-record">Xóa!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .video-container {
+        position: relative;
+        width: 100%;
+        height: 400px;
+        margin: 0 auto;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background: #000;
+    }
+
+    #video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .card {
+        height: 100%;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tablelist-form {
+        flex-grow: 1;
+    }
+
+    .alert {
+        margin-bottom: 0;
+    }
+
+    .highlight {
+        animation: highlight 1s ease-in-out;
+    }
+
+    @keyframes highlight {
+        0% {
+            background-color: #fff;
+        }
+        50% {
+            background-color: #e3f2fd;
+        }
+        100% {
+            background-color: #fff;
+        }
+    }
+</style>
+
+<script>
+    let stream = null;
+    let scanInterval = null;
+    const video = document.getElementById('video');
+    const stopButton = document.getElementById('stopCamera');
+    let lastRecognizedId = null;
+    let isProcessing = false;
+
+    // Hàm bắt đầu camera
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            });
+            video.srcObject = stream;
+            startScanning();
+        } catch (err) {
+            console.error('Error accessing camera:', err);
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Không thể truy cập camera. Vui lòng kiểm tra lại quyền truy cập.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+
+    // Hàm quét khuôn mặt với YOLO
+    function startScanning() {
+        scanInterval = setInterval(async () => {
+            if (isProcessing) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+
+            try {
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
+                const formData = new FormData();
+                formData.append('file', blob, 'scan.jpg');
+
+                isProcessing = true;
+
+                // Gửi request trực tiếp đến /recognize
+                const response = await fetch('/recognize', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                console.log('Response data:', data); // Thêm log để debug
+
+                if (data.success && data.student) {
+                    // Update student information form with the recognized data
+                    const studentData = {
+                        'image-field': data.student.image_path,
+                        'id-field': data.student.student_id,
+                        'customername-field': data.student.full_name,
+                        'text': data.student.student_code,
+                        'identifier-field': data.student.student_identifier,
+                        'class-field': data.student.class_name,
+                        'gender-field': data.student.gender,
+                        'email-field': data.student.email,
+                        'phone-field': data.student.phone
+                    };
+                    console.log('Updating form with:', studentData); // Thêm log để debug
+                    updateStudentInfo(studentData);
+
+                    // Cập nhật ID sinh viên đã nhận diện
+                    lastRecognizedId = data.student.id;
+
+                    // Show success message
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: `Đã nhận diện sinh viên: ${data.student.name}`,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+
+                    // Dừng quét sau khi xác thực thành công
+                    stopScanning();
+                } else {
+                    lastRecognizedId = null;
+                }
+            } catch (error) {
+                console.error('Error scanning:', error);
+                lastRecognizedId = null;
+            } finally {
+                isProcessing = false;
+            }
+        }, 2000); // Gửi request mỗi 2 giây
+    }
+
+    // Hàm dừng quét
+    function stopScanning() {
+        if (scanInterval) {
+            clearInterval(scanInterval);
+            scanInterval = null;
+        }
+    }
+
+    // Hàm dừng camera
+    function stopCamera() {
+        stopScanning();
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        video.srcObject = null;
+        stopButton.style.display = 'none';
+        lastRecognizedId = null; // Reset lastRecognizedId khi tắt camera
+        Swal.fire({
+            title: 'Camera đã tắt',
+            text: 'Nhấn nút "Bật Camera" để tiếp tục.',
+            icon: 'info',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    function updateStudentInfo(data) {
+        console.log('Updating form fields with:', data); // Thêm log để debug
+        clearStudentInfo();
+        // Cập nhật tất cả các trường thông tin
+        Object.keys(data).forEach(key => {
+            const element = document.getElementById(key);
+            if (element) {
+                console.log(`Updating field ${key} with value:`, data[key]); // Thêm log để debug
+                if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
+                    element.value = data[key] || "";
+                    // Thêm hiệu ứng highlight khi cập nhật
+                    element.classList.add('highlight');
+                    setTimeout(() => {
+                        element.classList.remove('highlight');
+                    }, 1000);
+                } else if (element.tagName === "IMG") {
+                    if (data[key]) {
+                        element.style.display = "none"; // Ẩn ảnh trước khi tải
+                        element.src = data[key];
+                        element.onload = function () {
+                            element.style.display = "block"; // Hiện ảnh khi tải xong
+                        };
+                    } else {
+                        element.style.display = "none"; // Ẩn ảnh nếu không có dữ liệu
+                    }
+                }
+            } else {
+                console.log(`Field ${key} not found in form`); // Thêm log để debug
+            }
+        });
+    }
+
+    function clearStudentInfo() {
+        // Clear all form fields
+        const form = document.querySelector('.tablelist-form');
+        const inputs = form.querySelectorAll('input');
+        const image = document.getElementById('image-field');
+        inputs.forEach(input => {
+            input.value = '';
+        });
+        if (image) {
+            image.style.display = "none";
+            image.src = '';
+        }
+        lastRecognizedId = null; // Reset lastRecognizedId khi xóa thông tin
+    }
+
+    function showDeleteModal() {
+        const modal = new bootstrap.Modal(document.getElementById('deleteRecordModal'));
+        modal.show();
+    }
+
+    // Event listeners
+    stopButton.addEventListener('click', stopCamera);
+
+    // Handle delete confirmation
+    document.getElementById('delete-record').addEventListener('click', function () {
+        clearStudentInfo();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteRecordModal'));
+        modal.hide();
+    });
+
+    // Bắt đầu camera khi trang được tải
+    document.addEventListener('DOMContentLoaded', startCamera);
+
+    // Cleanup khi rời trang
+    window.addEventListener('beforeunload', () => {
+        stopCamera();
+    });
+</script>
+{% endblock %}

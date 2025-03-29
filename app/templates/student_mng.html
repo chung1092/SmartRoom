@@ -1,0 +1,587 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-content">
+    <div class="container-fluid">
+
+        <!-- start page title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
+                    <h4 class="mb-sm-0">Danh sách <span id="studentCount">{{ students|length }}</span> sinh viên</h4>
+
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">Bảng</a></li>
+                            <li class="breadcrumb-item active">Danh sách sinh viên</li>
+                        </ol>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- end page title -->
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Thêm, Sửa và Xóa</h4>
+                    </div><!-- end card header -->
+
+                    <div class="card-body">
+                        <div class="listjs-table" id="customerList">
+                            <div class="row g-4 mb-3">
+                                <div class="col-sm-auto">
+                                    <div>
+                                        <button type="button" class="btn btn-success add-btn" data-bs-toggle="modal"
+                                            id="create-btn" data-bs-target="#showModal"><i
+                                                class="ri-add-line align-bottom me-1"></i> Thêm</button>
+                                        <input type="file" id="fileInput" accept=".xlsx, .csv" style="display: none;">
+                                        <button type="button" class="btn btn-success"
+                                            onclick="document.getElementById('fileInput').click();">
+                                            <i class="ri-upload-2-line align-bottom me-1"></i> Nhập File
+                                        </button>
+                                        <select id="classFilter" class="form-select d-inline-block w-auto ms-2">
+                                            <option value="0">Tất cả lớp</option>
+                                            {% for class in _class %}
+                                            <option value={{class.class_id}}>{{class.class_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm">
+                                    <div class="d-flex justify-content-sm-end">
+                                        <div class="search-box ms-2">
+                                            <input type="text" class="form-control search" placeholder="Tìm kiếm...">
+                                            <i class="ri-search-line search-icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive table-card mt-3 mb-1">
+                                <table class="table align-middle table-nowrap" id="customerTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" style="width: 50px;">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="checkAll"
+                                                        value="option">
+                                                </div>
+                                            </th>
+                                            <th class="sort" data-sort="customer_name">Họ và tên</th>
+                                            <th class="sort" data-sort="text">Mã sinh viên</th>
+                                            <th class="sort" data-sort="text">Giới tính</th>
+                                            <th class="sort" data-sort="text">Lớp hành chính</th>
+                                            <th class="sort" data-sort="email">Email</th>
+                                            <th class="sort" data-sort="phone">Số điện thoại</th>
+                                            <th class="sort" data-sort="text">Trạng thái</th>
+                                            <th class="sort" data-sort="action">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentList" class="list form-check-all">
+                                        {% for student in students %}
+                                        <tr>
+                                            <th scope="row">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="chk_child"
+                                                        value="{{ student.id }}">
+                                                </div>
+                                            </th>
+                                            <td class="id" style="display:none;"><a href="javascript:void(0);"
+                                                    class="fw-medium link-primary">#{{ student.student_id }}</a></td>
+                                            <td class="customer_name">{{ student.full_name }}</td>
+                                            <td class="text">{{ student.student_code }}</td>
+                                            {% if student.gender %}
+                                            <td class="text">Nam</td>
+                                            {% else %}
+                                            <td class="text">Nữ</td>
+                                            {% endif %}
+                                            <td class="email">{{ student.email }}</td>
+                                            <td class="email">{{ student.email }}</td>
+                                            <td class="phone">{{ student.phone }}</td>
+                                            <td class="text">
+                                                {% if student.face_encoding.size != NULL %}
+                                                <span class="badge bg-success">Đã xác thực</span>
+                                                {% else %}
+                                                <span class="badge bg-warning">Chưa xác thực</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+                                                    <div class="edit">
+                                                        <button class="btn btn-sm btn-success edit-item-btn"
+                                                            data-bs-toggle="modal" data-bs-target="#showModal"
+                                                            data-id="{{ student.student_id }}"
+                                                            data-name="{{ student.full_name }}"
+                                                            data-student-code="{{ student.student_code }}"
+                                                            data-student-identifier="{{ student.student_identifier }}"
+                                                            data-email="{{ student.email }}"
+                                                            data-phone="{{ student.phone }}"
+                                                            data-gender="{{ student.gender }}">
+                                                            Sửa
+                                                        </button>
+                                                    </div>
+                                                    <div class="remove">
+                                                        <button class="btn btn-sm btn-danger remove-item-btn"
+                                                            data-bs-toggle="modal" data-bs-target="#deleteRecordModal"
+                                                            data-id="{{ student.id }}">
+                                                            Xóa
+                                                        </button>
+                                                    </div>
+                                                    {% if student.face_encoding.size != NULL %}
+                                                    <div class="authenticate">
+                                                        <button class="btn btn-sm btn-success authenticate"
+                                                            data-id="{{ student.student_id }}" data-bs-toggle="modal"
+                                                            data-bs-target="#authenticateModal">
+                                                            Xác thực
+                                                        </button>
+                                                    </div>
+                                                    <div class="authenticate">
+                                                        <button class="btn btn-sm btn-success authenticate"
+                                                            data-id="{{ student.student_id }}" data-bs-toggle="modal"
+                                                            data-bs-target="#authenticateModal">
+                                                            Xác thực video
+                                                        </button>
+                                                    </div>
+                                                    {% else %}
+                                                    <div class="authenticate">
+                                                        <button class="btn btn-sm btn-danger authenticate"
+                                                            data-id="{{ student.student_id }}" data-bs-toggle="modal"
+                                                            data-bs-target="#authenticateModal">
+                                                            Xác thực
+                                                        </button>
+                                                    </div>
+                                                    <div class="authenticate">
+                                                        <button class="btn btn-sm btn-danger authenticate"
+                                                            data-id="{{ student.student_id }}" data-bs-toggle="modal"
+                                                            data-bs-target="#authenticateModal">
+                                                            Xác thực video
+                                                        </button>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <div class="noresult" style="display: none">
+                                    <div class="text-center">
+                                        <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                            colors="primary:#121331,secondary:#08a88a"
+                                            style="width:75px;height:75px"></lord-icon>
+                                        <h5 class="mt-2">Không tìm thấy kết quả</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <div class="pagination-wrap hstack gap-2">
+                                    <a class="page-item pagination-prev disabled" href="javascript:void(0);">
+                                        Trước
+                                    </a>
+                                    <ul class="pagination listjs-pagination mb-0"></ul>
+                                    <a class="page-item pagination-next" href="javascript:void(0);">
+                                        Tiếp theo
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- end card -->
+                </div>
+                <!-- end col -->
+            </div>
+            <!-- end col -->
+        </div>
+        <!-- end row -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="authenticateModal" tabindex="-1" aria-labelledby="authenticateModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="authenticateModalLabel">Xác thực khuôn mặt</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="authenticateForm" enctype="multipart/form-data" onsubmit="return false;">
+                            <input type="hidden" id="student_id" name="student_id">
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Chọn ảnh khuôn mặt</label>
+                                <input type="file" class="form-control" id="file" name="file" accept="image/*" required>
+                                <div class="invalid-feedback">Vui lòng chọn một ảnh.</div>
+                            </div>
+                            <div class="text-center mb-3">
+                                <video id="video" width="100%" autoplay style="display: none;"></video>
+                            </div>
+                            <div class="text-center">
+                                <button type="button" id="startCamera" class="btn btn-primary">
+                                    <i class="ri-camera-line"></i> Sử dụng Camera
+                                </button>
+                                <button type="button" id="captureBtn" class="btn btn-success" style="display: none;">
+                                    <i class="ri-camera-fill"></i> Chụp ảnh
+                                </button>
+                            </div>
+                            <div id="imagePreview" class="text-center mb-3" style="display: none;">
+                                <img id="previewImage" class="img-fluid rounded" style="max-height: 200px;">
+                            </div>
+                        </form>
+                        <div id="authMessage" class="mt-2"></div>
+                    </div>
+                    <div class="modal-footer" style="display: flex; justify-content: center;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-primary" id="submitAuthenticate">Xác nhận</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            id="btn-close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mt-2 text-center">
+                            <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
+                                colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
+                            <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                                <h4>Bạn có chắc ?</h4>
+                                <p class="text-muted mx-4 mb-0">Bạn có chắc là bạn muốn xóa bản ghi này không ?</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+                            <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Đóng</button>
+                            <button type="button" class="btn w-sm btn-danger " id="delete-record">Xóa!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end modal -->
+    </div>
+    <!-- container-fluid -->
+</div>
+<style>
+    /* Nền mờ phủ toàn màn hình */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        /* Nền mờ */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        /* Đảm bảo nằm trên cùng */
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    /* Hiển thị modal chính giữa */
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 400px;
+        text-align: center;
+        position: relative;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Nút đóng modal */
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Khi mở modal */
+    .modal-overlay.show {
+        visibility: visible;
+        opacity: 1;
+    }
+</style>
+<script>
+    document.getElementById("classFilter").addEventListener("change", function () {
+        let classId = this.value;
+
+        fetch("/filter_students", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ class_id: classId }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let tbody = document.getElementById("studentList");
+                    tbody.innerHTML = "";  // Xóa danh sách cũ
+
+                    data.students.forEach(student => {
+                        let row = `
+                    <tr>
+                        <th scope="row">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="chk_child" value="${student.id}">
+                            </div>
+                        </th>
+                        <td class="id" style="display:none;">
+                            <a href="javascript:void(0);" class="fw-medium link-primary">#${student.student_id}</a>
+                        </td>
+                        <td class="customer_name">${student.full_name}</td>
+                        <td class="text">${student.student_code}</td>
+                        <td class="text">${student.gender ? "Nam" : "Nữ"}</td>
+                        <td class="email">${student.email}</td>
+                        <td class="email">${student.email}</td>
+                        <td class="phone">${student.phone}</td>
+                        <td class="text">
+                            ${student.face_encoding ?
+                                '<span class="badge bg-success">Đã xác thực</span>' :
+                                '<span class="badge bg-warning">Chưa xác thực</span>'
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <div class="edit">
+                                    <button class="btn btn-sm btn-success edit-item-btn"
+                                        data-bs-toggle="modal" data-bs-target="#showModal"
+                                        data-id="${student.student_id}"
+                                        data-name="${student.full_name}"
+                                        data-student-code="${student.student_code}"
+                                        data-student-identifier="${student.student_identifier}"
+                                        data-email="${student.email}"
+                                        data-phone="${student.phone}"
+                                        data-gender="${student.gender}">
+                                        Sửa
+                                    </button>
+                                </div>
+                                <div class="remove">
+                                    <button class="btn btn-sm btn-danger remove-item-btn"
+                                        data-bs-toggle="modal" data-bs-target="#deleteRecordModal"
+                                        data-id="${student.id}">
+                                        Xóa
+                                    </button>
+                                </div>
+                                ${student.status ? `
+                                    <div class="authenticate">
+                                        <button class="btn btn-sm btn-success authenticate"
+                                            data-id="${student.student_id}" data-bs-toggle="modal"
+                                            data-bs-target="#authenticateModal">
+                                            Xác thực
+                                        </button>
+                                    </div>
+                                    <div class="authenticate">
+                                        <button class="btn btn-sm btn-success authenticate"
+                                            data-id="${student.student_id}" data-bs-toggle="modal"
+                                            data-bs-target="#authenticateModal">
+                                            Xác thực video
+                                        </button>
+                                    </div>
+                                ` : `
+                                    <div class="authenticate">
+                                        <button class="btn btn-sm btn-danger authenticate"
+                                            data-id="${student.student_id}" data-bs-toggle="modal"
+                                            data-bs-target="#authenticateModal">
+                                            Xác thực
+                                        </button>
+                                    </div>
+                                    <div class="authenticate">
+                                        <button class="btn btn-sm btn-danger authenticate"
+                                            data-id="${student.student_id}" data-bs-toggle="modal"
+                                            data-bs-target="#authenticateModal">
+                                            Xác thực video
+                                        </button>
+                                    </div>
+                                `}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                        tbody.innerHTML += row; 
+                    });
+                    document.getElementById("studentCount").innerText = data.students.length;
+                } else {
+                    console.error("Lỗi khi lọc sinh viên:", data.error);
+                }
+            })
+            .catch(error => console.error("Lỗi:", error));
+    });
+
+    function updateStudentInfo(studentData) {
+        for (let field in studentData) {
+            let element = document.getElementById(field);
+            if (element) {
+                element.textContent = studentData[field];
+            }
+        }
+    }
+
+    let stream = null;
+    const video = document.getElementById('video');
+    const startButton = document.getElementById('startCamera');
+    const captureButton = document.getElementById('captureBtn');
+    const previewImage = document.getElementById('previewImage');
+    const imagePreview = document.getElementById('imagePreview');
+    const submitButton = document.getElementById('submitAuthenticate');
+    const fileInput = document.getElementById('file');
+    let capturedImageBlob = null;
+
+    document.querySelectorAll(".authenticate button").forEach(button => {
+        button.addEventListener("click", function () {
+            let studentId = this.getAttribute("data-id");
+            document.getElementById("student_id").value = studentId;
+        });
+    });
+
+    fileInput.addEventListener("change", function (event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("previewImage").src = e.target.result;
+                document.getElementById("imagePreview").style.display = "block";
+                capturedImageBlob = file;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    startButton.addEventListener('click', async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            video.style.display = 'block';
+            startButton.style.display = 'none';
+            captureButton.style.display = 'inline-block';
+            fileInput.style.display = 'none';
+        } catch (err) {
+            console.error('Error accessing camera:', err);
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Không thể truy cập camera. Vui lòng kiểm tra lại quyền truy cập.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+
+    captureButton.addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        canvas.toBlob(blob => {
+            capturedImageBlob = blob;
+            previewImage.src = canvas.toDataURL('image/jpeg');
+            imagePreview.style.display = 'block';
+            video.style.display = 'none';
+            captureButton.style.display = 'none';
+            startButton.style.display = 'inline-block';
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }, 'image/jpeg');
+    });
+
+    submitButton.addEventListener('click', function () {
+        if (!capturedImageBlob) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Vui lòng chọn ảnh hoặc chụp ảnh trước khi xác nhận.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        let studentId = document.getElementById("student_id").value;
+        let timestamp = new Date().getTime(); // Thêm timestamp để tạo tên file duy nhất
+        let formData = new FormData();
+        formData.append("student_id", studentId);
+        formData.append("file", capturedImageBlob, "student_" + studentId + "_" + timestamp + ".jpg");
+
+        fetch("/add_face", {
+            method: "POST",
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                let messageDiv = document.getElementById("authMessage");
+                messageDiv.innerHTML = data.message;
+                if (data.success) {
+                    messageDiv.className = "mt-2 alert alert-success";
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    messageDiv.className = "mt-2 alert alert-danger";
+                }
+            })
+            .catch(error => {
+                let messageDiv = document.getElementById("authMessage");
+                messageDiv.innerHTML = "Có lỗi xảy ra: " + error;
+                messageDiv.className = "mt-2 alert alert-danger";
+            });
+    });
+
+    // Clean up when modal is closed
+    document.getElementById('authenticateModal').addEventListener('hidden.bs.modal', function () {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+        startButton.style.display = 'inline-block';
+        captureButton.style.display = 'none';
+        video.style.display = 'none';
+        fileInput.style.display = 'block';
+        imagePreview.style.display = 'none';
+        previewImage.src = '';
+        capturedImageBlob = null;
+    });
+
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/add_student_file', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => response.json())  // Đọc phản hồi JSON
+            .then(data => {
+                if (data.success) {
+                    window.location.href = "/student_mng";  // Reload trang bằng JavaScript
+                } else {
+                    Swal.fire("Lỗi!", data.message, "error");
+                }
+            })
+            .catch(error => {
+                Swal.fire("Lỗi!", "Không thể tải file lên!", "error");
+            });
+    });
+
+    document.getElementById("add-btn").addEventListener("click", function (event) {
+        event.preventDefault(); // Ngăn chặn hành vi mặc định của nút
+        document.getElementById("add-student-form").submit(); // Submit form bằng JavaScript
+    });
+</script>
+{% endblock %}
